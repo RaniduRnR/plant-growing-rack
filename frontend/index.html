@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>My Digital Twin</title>
+  <style>
+    body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
+    #light-panel {
+      position: fixed; top: 16px; left: 16px; padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.6); color: #fff; border-radius: 8px;
+      display: flex; flex-direction: column; gap: 8px; min-width: 200px;
+    }
+    #light-panel button {
+      padding: 6px 12px; border: 0; border-radius: 4px; cursor: pointer;
+      font-weight: bold; background: #f5c542; color: #222;
+    }
+    #light-panel button.off { background: #555; color: #ddd; }
+    #light-panel label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+  </style>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div id="light-panel">
+    <button id="light-toggle">Room Light: ON</button>
+    <button id="grow-toggle">Grow Lights: ON</button>
+    <label>
+      <span>Grow Light: <span id="grow-value">100</span>%</span>
+      <input type="range" id="grow-brightness" min="0" max="200" value="100" />
+    </label>
+    <div id="status" style="font-size: 14px;">Backend: connecting...</div>
+  </div>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
