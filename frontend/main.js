@@ -76,33 +76,33 @@ function setGrowLights(on) {
   applyGrowLights();
 }
 
-// Send a command to the backend. It replies with e.g.
-// { "status": "successful", "action": "LIGHT_ON" }
-// and the 3D scene is only updated when the backend reports success.
+// Actions from the IoT "result" part, e.g. { "status": "SUCCESS", "action": "LIGHTS_ON" }
 const ACTIONS = {
-  LIGHT_ON: () => setGrowLights(true),
-  LIGHT_OFF: () => setGrowLights(false),
+  LIGHTS_ON: () => setGrowLights(true),
+  LIGHTS_OFF: () => setGrowLights(false),
 };
 
-async function sendAction(action) {
+// Follow the real grow light: poll the latest IoT action result and
+// apply it to the 3D model only when its status is SUCCESS.
+let lastGrowMessageId = null;
+
+async function syncGrowLightFromIoT() {
   try {
-    const res = await fetch('/api/action', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action }),
-    });
-    const data = await res.json();
-    if (data.status === 'successful' && ACTIONS[data.action]) {
+    const data = await (await fetch('/api/grow-light')).json();
+    if (!data.message_id || data.message_id === lastGrowMessageId) return;  // nothing new
+    lastGrowMessageId = data.message_id;
+
+    if (data.status === 'SUCCESS' && ACTIONS[data.action]) {
       ACTIONS[data.action]();
     } else {
-      console.warn('Action failed or unknown:', data);
+      console.warn('IoT action not applied:', data);
     }
   } catch (err) {
-    console.error('Could not reach backend:', err);
+    console.error('Could not read grow light state:', err);
   }
 }
-
-growBtn.addEventListener('click', () => sendAction(growOn ? 'LIGHT_OFF' : 'LIGHT_ON'));
+syncGrowLightFromIoT();
+setInterval(syncGrowLightFromIoT, 2000);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 

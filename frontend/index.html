@@ -14,7 +14,8 @@
       padding: 6px 12px; border: 0; border-radius: 4px; cursor: pointer;
       font-weight: bold; background: #f5c542; color: #222;
     }
-    #light-panel button.off { background: #555; color: #ddd; }
+    #light-panel button.off, #light-panel .indicator.off { background: #555; color: #ddd; }
+    #light-panel .indicator { padding: 6px 12px; border-radius: 4px; font-weight: bold; background: #f5c542; color: #222; text-align: center; }
     #light-panel label { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
   </style>
 
@@ -30,7 +31,7 @@
 <body>
   <div id="light-panel">
     <button id="light-toggle">Room Light: ON</button>
-    <button id="grow-toggle">Grow Lights: ON</button>
+    <div id="grow-toggle" class="indicator">Grow Lights: waiting...</div>
     <label>
       <span>Grow Light: <span id="grow-value">100</span>%</span>
       <input type="range" id="grow-brightness" min="0" max="200" value="100" />
