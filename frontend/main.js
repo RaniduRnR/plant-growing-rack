@@ -68,12 +68,41 @@ growSlider.addEventListener('input', () => {
 });
 
 const growBtn = document.getElementById('grow-toggle');
-growBtn.addEventListener('click', () => {
-  growOn = !growOn;
+
+function setGrowLights(on) {
+  growOn = on;
   growBtn.textContent = growOn ? 'Grow Lights: ON' : 'Grow Lights: OFF';
   growBtn.classList.toggle('off', !growOn);
   applyGrowLights();
-});
+}
+
+// Send a command to the backend. It replies with e.g.
+// { "status": "successful", "action": "LIGHT_ON" }
+// and the 3D scene is only updated when the backend reports success.
+const ACTIONS = {
+  LIGHT_ON: () => setGrowLights(true),
+  LIGHT_OFF: () => setGrowLights(false),
+};
+
+async function sendAction(action) {
+  try {
+    const res = await fetch('/api/action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action }),
+    });
+    const data = await res.json();
+    if (data.status === 'successful' && ACTIONS[data.action]) {
+      ACTIONS[data.action]();
+    } else {
+      console.warn('Action failed or unknown:', data);
+    }
+  } catch (err) {
+    console.error('Could not reach backend:', err);
+  }
+}
+
+growBtn.addEventListener('click', () => sendAction(growOn ? 'LIGHT_OFF' : 'LIGHT_ON'));
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
